@@ -1,3 +1,5 @@
+use aoc23::input::get_input;
+
 // 
 // fn main() {
 //     let file_content = std::fs::read_to_string("input.txt").unwrap();
@@ -16,11 +18,9 @@
 // }
 // 
 
-fn main() {
-    let file_content = std::fs::read_to_string("input.txt").unwrap();
-
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut numbers = Vec::new();
-    for line in file_content.split('\n') {
+    for line in get_input()?.split('\n') {
         let mut v = Vec::new();
         
         let mut i = 0;
@@ -64,4 +64,5 @@ fn main() {
         .sum();
 
     println!("calibration value is {result}");
+    Ok(())
 }
