@@ -1,35 +1,35 @@
-use std::cmp::max;
-use aoc23::input::get_input;
+pub struct Day2Part1;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let content = get_input()?;
-    let games: Vec<Game> = content.lines().map(Game::parse).collect();
+impl crate::days::Day for Day2Part1 {
+    fn solve(&self, input: String) -> String { 
+        let games: Vec<Game> = input.lines().map(Game::parse).collect();
 
-    let set_power_sum: u32 = games
-        .iter()
-        .map(|g|
-             g.sets.iter()
-                .fold(CubeSet::default(),
-                    |acc, s| {
-                        CubeSet {
-                            red: max(acc.red, s.red),
-                            blue: max(acc.blue, s.blue),
-                            green: max(acc.green, s.green),
-                        }
-                    }
-                )
-                .power()
-        )
-        .sum();
+        let available_cubes = CubeSet {
+            red: 12,
+            blue: 14,
+            green: 13,
+        };
 
-    println!("{set_power_sum}");
+        let id_sum: u32 = games
+            .iter()
+            .filter(|g|
+                g.sets.iter()
+                    .all(|set|
+                        set.red <= available_cubes.red &&
+                        set.blue <= available_cubes.blue &&
+                        set.green <= available_cubes.green
+                    )
+            )
+            .map(|g| g.id)
+            .sum();
 
-    Ok(())
+        id_sum.to_string()
+    }
 }
 
 #[derive(Debug)]
 struct Game {
-    _id: u32,
+    id: u32,
     sets: Vec<CubeSet>,
 }
 
@@ -40,13 +40,13 @@ impl Game {
         let sets: Vec<CubeSet> = sets.split("; ").map(CubeSet::parse).collect();
 
         Self {
-            _id: id,
+            id,
             sets,
         }
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 struct CubeSet {
     red: u32,
     blue: u32,
@@ -74,9 +74,4 @@ impl CubeSet {
 
         cubes
     }
-
-    pub fn power(&self) -> u32 {
-        self.red * self.blue * self.green
-    }
 }
-
