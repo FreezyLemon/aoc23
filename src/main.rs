@@ -1,8 +1,5 @@
-mod days;
-
 use std::collections::hash_map::HashMap;
-
-use crate::days::*;
+use aoc23::*;
 
 macro_rules! map_entry {
     ($k:literal, $v:expr) => {
@@ -52,9 +49,3 @@ impl std::fmt::Display for ProgramError {
 
 impl std::error::Error for ProgramError {}
 
-fn get_input(day: &str, maybe_input: Option<String>) -> Result<String, Box<dyn std::error::Error>> {
-    let (day, _part) = day.split_once('-').unwrap();
-    let input_path = maybe_input.unwrap_or(format!("inputs/{}.txt", day));
-
-    Ok(std::fs::read_to_string(input_path)?)
-}
