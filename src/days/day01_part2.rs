@@ -43,7 +43,7 @@ impl crate::days::Day for Day1Part2 {
         }
 
         let result: u32 = numbers.into_iter()
-            .map(|ds| ds.first().unwrap().clone() * 10 + ds.last().unwrap().clone())
+            .map(|ds| *ds.first().unwrap() * 10 + *ds.last().unwrap())
             .sum();
 
         result.to_string()
