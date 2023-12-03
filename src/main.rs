@@ -11,6 +11,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let days: HashMap<String, Box<dyn Day>> = HashMap::from([
         map_entry!("day01-part1", Day1Part1),
         map_entry!("day01-part2", Day1Part2),
+        map_entry!("day01-part2-malox", Day1Part2Malox),
         map_entry!("day02-part1", Day2Part1),
         map_entry!("day02-part2", Day2Part2),
     ]);
