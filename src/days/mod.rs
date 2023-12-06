@@ -7,6 +7,7 @@ mod day03_part1;
 mod day03_part2;
 mod day04_part1;
 mod day04_part2;
+mod day05_part1;
 
 pub use day01_part1::*;
 pub use day01_part2::*;
@@ -17,6 +18,7 @@ pub use day03_part1::*;
 pub use day03_part2::*;
 pub use day04_part1::*;
 pub use day04_part2::*;
+pub use day05_part1::*;
 
 pub trait Day {
     fn solve(&self, input: String) -> String;
