@@ -19,6 +19,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
         map_entry!("day04-part2", Day4Part2),
         map_entry!("day05-part1", Day5Part1),
         map_entry!("day05-part2", Day5Part2),
+        map_entry!("day06-part1", Day6Part1),
     ]);
         
     let mut args = std::env::args().skip(1);
