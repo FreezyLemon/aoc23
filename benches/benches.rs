@@ -20,10 +20,20 @@ fn bench_day1_part2_malox(c: &mut Criterion) {
     });
 }
 
+fn bench_day4_part2(c: &mut Criterion) {
+    c.bench_function("day 4 part 2", |b| {
+        let day = Day4Part2;
+        let input = get_input("day04-part2", None).unwrap();
+
+        b.iter(|| day.solve(black_box(input.clone())));
+    });
+}
+
 criterion_group!(
     benches,
     bench_day1_part2,
     bench_day1_part2_malox,
+    bench_day4_part2,
 );
 
 criterion_main!(benches);
