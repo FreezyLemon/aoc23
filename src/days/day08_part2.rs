@@ -1,27 +1,30 @@
-use std::io::Write;
+use std::collections::HashMap;
 
 pub struct Day8Part2;
 
 impl crate::days::Day for Day8Part2 {
     fn solve(&self, input: String) -> String {
         let mut lines_iter = input.lines();
-        let instructions = lines_iter.next().expect("has at least one line")
+        let instructions: Vec<Direction> = lines_iter.next().expect("has at least one line")
             .chars()
             .map(|c| match c {
                 'R' => Direction::Right,
                 'L' => Direction::Left,
                 _ => panic!("invalid input"),
-            });
- 
+            })
+        .collect();
+        
         lines_iter.next().unwrap(); // ignore empty line
- 
-        let raw_nodes: Vec<(String, RawNode)> = lines_iter.map(|l| l.split_once('=').expect("line has ="))
+        
+        let path_map: HashMap<String, Node> = lines_iter.map(|l| l.split_once('=').expect("line has ="))
             .map(|(name, paths)| {
+                let name = name.trim().to_string();
                 let (l, r) = paths.trim().split_once(',').expect("line has ,");
-
+                
                 (
-                    name.trim().to_string(),
-                    RawNode {
+                    name.clone(),
+                    Node {
+                        _name: name,
                         left: l.trim_start_matches('(').to_string(),
                         right: r.trim().trim_end_matches(')').to_string(),
                     }
@@ -29,90 +32,61 @@ impl crate::days::Day for Day8Part2 {
             })
             .collect();
 
-        let start_node_ids: Vec<usize> = raw_nodes.iter()
-            .enumerate()
-            .filter(|(_, (name, _))| name.ends_with('A'))
-            .map(|(idx, _)| idx)
-            .collect();
+        let end_steps_per_node: Vec<i64> = path_map
+            .iter()
+            .filter(|(name, _)| name.ends_with('A'))
+            .map(|(_name, node)| {
+                let mut steps = 0;
+                let mut curr_node = node;
+                for dir in instructions.iter().cycle() {
+                    let next_node_name = match dir {
+                        Direction::Left => &curr_node.left,
+                        Direction::Right => &curr_node.right,
+                    };
 
-        let end_node_ids: Vec<usize> = raw_nodes.iter()
-            .enumerate()
-            .filter(|(_, (name, _))| name.ends_with('Z'))
-            .map(|(idx, _)| idx)
-            .collect();
+                    steps += 1;
 
-        let parsed_nodes: Vec<Node> = raw_nodes.iter()
-            .enumerate()
-            .map(|(idx, (_, node))| {
-                let (left_idx, _) = raw_nodes.iter()
-                    .enumerate()
-                    .find(|(_, (name, _))| name == &node.left)
-                    .unwrap();
-
-                let (right_idx, _) = raw_nodes.iter()
-                    .enumerate()
-                    .find(|(_, (name, _))| name == &node.right)
-                    .unwrap();
-
-                Node {
-                    id: u16::try_from(idx).unwrap(),
-                    left: u16::try_from(left_idx).unwrap(),
-                    right: u16::try_from(right_idx).unwrap(),
+                    if next_node_name.ends_with('Z') {
+                        break;
+                    }
+                    curr_node = path_map.get(next_node_name).unwrap();
                 }
+
+                steps
             })
             .collect();
 
-        drop(raw_nodes);
-
-        let mut node_buffer: Vec<&Node> = start_node_ids.into_iter()
-            .map(|id| &parsed_nodes[id])
-            .collect();
-
-        let mut stdout = std::io::stdout().lock();
-        let mut steps: i64 = 0;
-        for instr in instructions.cycle() {
-            if steps % 10_000_000 == 0 {
-                stdout.write_all(format!("\rfinished step {}M", steps / 1_000_000).as_bytes()).unwrap();
-                stdout.flush().unwrap();
-            }
-            for node in &mut node_buffer {
-                let next_node_id = match instr {
-                    Direction::Left => node.left,
-                    Direction::Right => node.right,
-                };
-
-                *node = &parsed_nodes[next_node_id as usize];
-            }
-
-            steps += 1;
-
-            if node_buffer.iter().all(|n| end_node_ids.contains(&(n.id as usize))) {
-                break;
-            }
-        }
-
-        // reset stdout to overwrite the "finished step X"
-        stdout.write(b"\r").unwrap();
-        drop(stdout); // this also flushes IIRC
-
-        steps.to_string()
+        lcm(end_steps_per_node).to_string()
     }
 }
 
-#[derive(Debug, Clone)]
-struct RawNode {
+fn lcm(mut ints: Vec<i64>) -> i64 {
+    assert!(ints.len() > 1);
+
+    let orig = ints.clone();
+    loop {
+        let v = ints[0];
+        if ints.iter().all(|&x| x == v) {
+            return v;
+        }
+
+        let (idx, _) = ints.iter()
+            .enumerate()
+            .min_by_key(|(_, &val)| val)
+            .unwrap();
+
+        ints[idx] += orig[idx];
+    }
+}
+
+#[derive(Debug)]
+struct Node {
+    _name: String,
     left: String,
     right: String,
 }
 
 #[derive(Debug)]
-struct Node {
-    id: u16,
-    left: u16,
-    right: u16,
-}
-
-#[derive(Debug, Clone, Copy)]
 enum Direction {
     Left,
     Right,
