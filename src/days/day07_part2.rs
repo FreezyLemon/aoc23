@@ -33,8 +33,14 @@ struct Hand([CamelCard; HAND_SIZE]);
 impl Hand {
     pub fn hand_type(&self) -> HandType {
         let mut card_counts = Vec::with_capacity(HAND_SIZE);
+        let mut joker_count = 0;
 
         'outer: for c in &self.0 {
+            if *c == CamelCard::J {
+                joker_count += 1;
+                continue;
+            }
+
             for (card, cnt) in &mut card_counts {
                 if *card == c {
                     *cnt += 1;
@@ -45,26 +51,23 @@ impl Hand {
             card_counts.push((c, 1));
         }
 
-        let joker_count = if let Some(idx) = card_counts.iter().position(|(card, _)| **card == CamelCard::J) {
-            let (_, count) = card_counts.remove(idx);
-            count
-        } else {
-            0
-        };
+        let mut card_counts: Vec<_> = card_counts.into_iter()
+            .map(|(_, cnt)| cnt)
+            .collect();
 
         if joker_count >= 4 {
             return HandType::FiveOfAKind;
         }
 
-        card_counts.sort_unstable_by_key(|(_, cnt)| -cnt);
-        card_counts.get_mut(0).unwrap().1 += joker_count;
+        card_counts.sort_unstable();
+        *card_counts.last_mut().unwrap() += joker_count;
         match &card_counts[..] {
-            [(_, 5), ..] => HandType::FiveOfAKind,
-            [(_, 4), ..] => HandType::FourOfAKind,
-            [(_, 3), (_, 2), ..] => HandType::FullHouse,
-            [(_, 3), ..] => HandType::ThreeOfAKind,
-            [(_, 2), (_, 2), ..] => HandType::TwoPair,
-            [(_, 2), ..] => HandType::OnePair,
+            [.., 5] => HandType::FiveOfAKind,
+            [.., 4] => HandType::FourOfAKind,
+            [.., 2, 3] => HandType::FullHouse,
+            [.., 3] => HandType::ThreeOfAKind,
+            [.., 2, 2] => HandType::TwoPair,
+            [.., 2] => HandType::OnePair,
             _ => HandType::HighCard,
         }
     }
