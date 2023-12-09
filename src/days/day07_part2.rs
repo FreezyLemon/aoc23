@@ -17,8 +17,6 @@ impl crate::days::Day for Day7Part2 {
         // sorted ascending (weakest card first)
         parsed.sort_by_key(|(_, hand, _)| hand.clone());
 
-        println!("{parsed:#?}");
-
         parsed.into_iter()
             .enumerate()
             .map(|(idx, (_, _, bid))| (idx as i32 + 1) * bid)
@@ -59,28 +57,14 @@ impl Hand {
         }
 
         card_counts.sort_unstable_by_key(|(_, cnt)| -cnt);
+        card_counts.get_mut(0).unwrap().1 += joker_count;
         match &card_counts[..] {
             [(_, 5), ..] => HandType::FiveOfAKind,
-            [(_, 4), ..] if joker_count >= 1 => HandType::FiveOfAKind,
-            [(_, 3), ..] if joker_count >= 2 => HandType::FiveOfAKind,
-            [(_, 2), ..] if joker_count >= 3 => HandType::FiveOfAKind,
-
             [(_, 4), ..] => HandType::FourOfAKind,
-            [(_, 3), ..] if joker_count >= 1 => HandType::FourOfAKind,
-            [(_, 2), ..] if joker_count >= 2 => HandType::FourOfAKind,
-
             [(_, 3), (_, 2), ..] => HandType::FullHouse,
-            [(_, 2), (_, 2), ..] if joker_count >= 1 => HandType::FullHouse,
-
             [(_, 3), ..] => HandType::ThreeOfAKind,
-            [(_, 2), ..] if joker_count >= 1 => HandType::ThreeOfAKind,
-            [(_, 1), ..] if joker_count >= 2 => HandType::ThreeOfAKind,
-
             [(_, 2), (_, 2), ..] => HandType::TwoPair,
-
             [(_, 2), ..] => HandType::OnePair,
-            [(_, 1), ..] if joker_count >= 1 => HandType::OnePair,
-
             _ => HandType::HighCard,
         }
     }
