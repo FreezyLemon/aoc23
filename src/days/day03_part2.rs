@@ -1,78 +1,72 @@
-// use std::collections::VecDeque;
+pub struct Day3Part2;
 
-// use std::cmp::max;
+// assumption: all lines are the same length
+// (the input is a square)
 
-// pub struct Day3Part2;
+impl crate::days::Day for Day3Part2 {
+    fn solve(&self, input: String) -> String {
+        let gear_candidates: Vec<(usize, usize)> = input.lines()
+            .map(str::chars)
+            .map(Iterator::enumerate)
+            .enumerate()
+            .flat_map(|(y, chars)| {
+                chars.filter(|(_, c)| c == &'*')
+                    .map(move |(x, _)| (x, y))
+            })
+            .collect();
 
-// // assumption: all lines are the same length
-// // (the input is a square)
+        let part_nos: Vec<_> = input.lines()
+            .enumerate()
+            .flat_map(|(y, l)| {
+                let mut part_nos_with_position = Vec::new();
 
-// impl crate::days::Day for Day3Part2 {
-//     fn solve(&self, input: String) -> String {
-//         let lines: Vec<_> = input.lines().collect();
-        
-//         let mut last_line_part_nos: VecDeque<((usize, usize), u32)> = VecDeque::new();
-//         let mut gears_with_one_part_no: VecDeque<(usize, u32)> = VecDeque::new();
+                let mut s = String::new();
+                for (x, c) in l.chars().enumerate() {
+                    if c.is_ascii_digit() {
+                        s.push(c);
+                    } else if !s.is_empty() {
+                        let part_no: i32 = s.parse().unwrap();
+                        part_nos_with_position.push((
+                            part_no,
+                            ((x - 1).saturating_sub(s.chars().count())..=x),
+                            (y.saturating_sub(1)..=y.saturating_add(1)),
+                        ));
+                        s.clear();
+                    }
+                }
 
-//         for line in &lines {
-//             let mut running_part_no = None;
+                if !s.is_empty() {
+                    let x = l.chars().count();
+                    let part_no: i32 = s.parse().unwrap();
+                    part_nos_with_position.push((
+                        part_no,
+                        ((x - 1).saturating_sub(s.chars().count())..=x),
+                        (y.saturating_sub(1)..=y.saturating_add(1)),
+                    ));
+                }
 
-//             for (x, c) in line.chars().enumerate() {
-//                 if c.is_ascii_digit() {
-//                     let curr_x = max(0, x); // TODO: Fix this mess
+                part_nos_with_position
+            })
+            .collect();
 
-//                     running_part_no = match running_part_no {
-//                         None => Some(((curr_x, curr_x), c.to_digit(10).unwrap())),
-//                         Some(((x_start, x_end), curr_val)) => Some((
-//                             (x_start, curr_x),
-//                             curr_val * 10 + c.to_digit(10).unwrap()
-//                         )),
-//                     };
-//                 } else {
-//                     if c == '*' && running_part_no.is_some() {
-//                         gears_with_one_part_no.push_back((x, running_part_no.unwrap().1));
-//                     }
+        // println!("{part_nos:#?}");
 
-//                     if let Some(part_no) = running_part_no.take() {
-//                         last_line_part_nos.push_back(part_no);
-//                     }
-//                 }
-//             }
-//         }
+        let mut gear_ratio_sum = 0;
+        for (x, y) in gear_candidates {
+            let adjacent_nos: Vec<i32> = part_nos.iter()
+                .filter(|(_, xr, yr)| xr.contains(&x) && yr.contains(&y))
+                .map(|(pno, _, _)| *pno)
+                .collect();
 
+            if adjacent_nos.len() >= 2 {
+                gear_ratio_sum += adjacent_nos
+                    .into_iter()
+                    .reduce(|acc, x| acc * x)
+                    .unwrap();
+            }
+        }
 
-//         let gear_idxs: Vec<(i32, i32)> = lines.iter()
-//             .map(|l| l
-//                  .match_indices(|c| c == '*')
-//                  .map(|(idx, _)| idx)
-//             )
-//             .enumerate()
-//             .flat_map(|(y, idxs)| idxs.map(move |x| (x as i32, y as i32)))
-//             .collect();
-
-//         // println!("{symbol_idxs:#?}");
-
-//         'gear: for (gx, gy) in gear_idxs {
-//             let mut adj_number = false;
-//             for x in gx-1..gx+1 {
-//                 for y in gy-1..gx+1 {
-//                     if lines.get(y as usize).map_or(false, |l| l.chars().nth(x as usize).map_or(false, |c| c.is_ascii_digit())) {
-//                         if adj_number {
-//                             // oh shit
-//                             continue 'gear;
-//                         } else {
-//                             adj_number = true;
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-        
-//         "".into()
-//     }
-// }
-
-// fn char_is_symbol(c: char) -> bool {
-//     !c.is_ascii_digit() && c != '.'
-// }
+        gear_ratio_sum.to_string()
+    }
+}
 

@@ -15,6 +15,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
         map_entry!("day02-part1", Day2Part1),
         map_entry!("day02-part2", Day2Part2),
         map_entry!("day03-part1", Day3Part1),
+        map_entry!("day03-part2", Day3Part2),
         map_entry!("day04-part1", Day4Part1),
         map_entry!("day04-part2", Day4Part2),
         map_entry!("day05-part1", Day5Part1),
