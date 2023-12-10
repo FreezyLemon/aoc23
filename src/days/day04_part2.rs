@@ -22,8 +22,8 @@ impl crate::days::Day for Day4Part2 {
             .filter(|(_, w)| *w > 0)
             .fold(vec![1u32; card_count], |mut amnts: Vec<u32>, (idx, win_amount)| {
                 let curr_amount = amnts[idx];
-                for i in idx+1..=(idx + win_amount as usize) {
-                    amnts[i] += curr_amount;
+                for amnt in amnts.iter_mut().skip(idx + 1).take(win_amount as usize) {
+                    *amnt += curr_amount;
                 }
                 amnts
             })
