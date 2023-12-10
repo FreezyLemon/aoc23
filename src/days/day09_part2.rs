@@ -10,7 +10,8 @@ impl crate::days::Day for Day9Part2 {
                     .map(Result::unwrap)
                     .collect();
 
-                let mut all_histories = vec![first_history];
+                let mut all_histories = Vec::with_capacity(first_history.len());
+                all_histories.push(first_history);
                 while let Some(history) = all_histories.last() {
                     if history.iter().all(|&i| i == 0) {
                         break;
