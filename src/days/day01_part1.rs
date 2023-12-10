@@ -5,11 +5,11 @@ impl crate::days::Day for Day1Part1 {
         let calibration_value: u32 = input
             .lines()
             .map(|l| {
-                let all_digits: Vec<u32> = l.chars()
-                    .filter_map(|c| c.to_digit(10))
-                    .collect();
+                let mut all_digits = l.chars().filter_map(|c| c.to_digit(10));
+                let first = all_digits.next().unwrap();
+                let last = all_digits.next_back().unwrap_or(first);
 
-                all_digits[0] * 10 + all_digits.last().unwrap()
+                first * 10 + last
             })
             .sum();
 
