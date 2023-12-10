@@ -33,8 +33,6 @@ impl crate::days::Day for Day5Part2 {
 
         for category in map_categories {
             for (map_range, offset) in category {
-                // println!("applying ({map_range:?}, {offset}) to {seed_ranges:?}");
-
                 let map_s = *map_range.start();
                 let map_e = *map_range.end() + 1;
 
@@ -64,20 +62,12 @@ impl crate::days::Day for Day5Part2 {
                 }
 
                 seed_ranges = next_ranges;
-                // println!("resulting in {seed_ranges:?}");
-                // println!();
             }
-
-            // println!();
         }
-
-        // println!("{seed_ranges:?}");
 
         let final_vals: Vec<i64> = seed_ranges.into_iter()
             .map(|(range, offset)| range.start + offset)
             .collect();
-
-        println!("{final_vals:?}");
 
         final_vals.into_iter()
             .min()

@@ -16,8 +16,6 @@ impl crate::days::Day for Day3Part1 {
             .flat_map(|(y, idxs)| idxs.map(move |x| (x as i32, y as i32)))
             .collect();
 
-        // println!("{symbol_idxs:#?}");
-
         let mut part_numbers: Vec<u32> = Vec::new();
 
         for (y, line) in lines.into_iter().enumerate() {
@@ -50,8 +48,6 @@ impl crate::days::Day for Day3Part1 {
                 part_numbers.push(cur_number_string.parse().expect("can be parsed"));
             }
         }
-
-        println!("{part_numbers:?}");
 
         part_numbers.into_iter().sum::<u32>().to_string()
     }
