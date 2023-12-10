@@ -20,13 +20,12 @@ impl crate::days::Day for Day4Part2 {
             })
             .enumerate()
             .filter(|(_, w)| *w > 0)
-            .fold(vec![1u32; card_count], |amnts: Vec<u32>, (idx, win_amount)| {
+            .fold(vec![1u32; card_count], |mut amnts: Vec<u32>, (idx, win_amount)| {
                 let curr_amount = amnts[idx];
-                amnts.iter()
-                    .skip(idx + 1)
-                    .take(win_amount as usize)
-                    .map(|&amnt| amnt + curr_amount)
-                    .collect()
+                for i in idx+1..=(idx + win_amount as usize) {
+                    amnts[i] += curr_amount;
+                }
+                amnts
             })
             .into_iter()
             .sum::<u32>()
