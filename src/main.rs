@@ -1,39 +1,62 @@
 use std::collections::hash_map::HashMap;
+
 use aoc23::*;
+use paste::paste;
+
+macro_rules! make_day_string {
+    ($d:literal, $p:literal) => {
+        format!("d{}p{}", $d, $p)
+    };
+    ($d:literal, $p:literal, $suffix:expr) => {
+        format!("{}-{}", make_day_string!($d, $p), std::primitive::str::to_lowercase($suffix))
+    };
+}
+
+macro_rules! make_day_struct {
+    ($d:literal, $p:literal $(, $suffix:literal)?) => {
+        paste! { [<Day $d Part $p $($suffix)?>] }
+    };
+}
 
 macro_rules! map_entry {
-    ($k:literal, $v:expr) => {
-        (String::from($k), Box::new($v) as Box<dyn Day>)
+    ($d:literal, $p:literal $(, $suffix:literal)?) => {
+        (make_day_string!($d, $p $(, $suffix)?), Box::new(make_day_struct!($d, $p $(, $suffix)?)) as Box<dyn Day>)
     };
 }
 
 pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let days: HashMap<String, Box<dyn Day>> = HashMap::from([
-        map_entry!("day01-part1", Day1Part1),
-        map_entry!("day01-part2", Day1Part2),
-        map_entry!("day01-part2-malox", Day1Part2Malox),
-        map_entry!("day02-part1", Day2Part1),
-        map_entry!("day02-part2", Day2Part2),
-        map_entry!("day03-part1", Day3Part1),
-        map_entry!("day03-part2", Day3Part2),
-        map_entry!("day04-part1", Day4Part1),
-        map_entry!("day04-part2", Day4Part2),
-        map_entry!("day05-part1", Day5Part1),
-        map_entry!("day05-part2", Day5Part2),
-        map_entry!("day06-part1", Day6Part1),
-        map_entry!("day06-part2", Day6Part2),
-        map_entry!("day07-part1", Day7Part1),
-        map_entry!("day07-part2", Day7Part2),
-        map_entry!("day08-part1", Day8Part1),
-        map_entry!("day08-part2", Day8Part2),
-        map_entry!("day09-part1", Day9Part1),
-        map_entry!("day09-part2", Day9Part2),
+        map_entry!(1, 1),
+        map_entry!(1, 2),
+        map_entry!(1, 2, "Malox"),
+        map_entry!(2, 1),
+        map_entry!(2, 2),
+        map_entry!(3, 1),
+        map_entry!(3, 2),
+        map_entry!(4, 1),
+        map_entry!(4, 2),
+        map_entry!(5, 1),
+        map_entry!(5, 2),
+        map_entry!(6, 1),
+        map_entry!(6, 2),
+        map_entry!(7, 1),
+        map_entry!(7, 2),
+        map_entry!(8, 1),
+        map_entry!(8, 2),
+        map_entry!(9, 1),
+        map_entry!(9, 2),
     ]);
         
     let mut args = std::env::args().skip(1);
     let Some(day) = args.next() else {
         return Err(Box::new(ProgramError::NotEnoughArguments));
     };
+
+    if day == "-h" || day == "--help" {
+        println!("available implementations:");
+        println!("{:?}", days.into_keys().collect::<Vec<_>>());
+        return Ok(());
+    }
 
     let Some(day_impl) = days.get(&day) else {
         return Err(Box::new(ProgramError::NoImplementationFound));
