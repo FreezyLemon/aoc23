@@ -85,7 +85,7 @@ impl crate::days::Day for Day10Part2 {
         let left_partition: Vec<Position> = left_partition.into_iter()
             .filter(|pos| !loop_path.contains(pos))
             .collect();
-        println!("left: {}", left_partition.len());
+        // println!("left: {}", left_partition.len());
 
         right_partition.sort_unstable();
         right_partition.dedup();
@@ -96,8 +96,8 @@ impl crate::days::Day for Day10Part2 {
         let (left_is_outside, left_partition) = complete_partition(left_partition, &tile_map, &loop_path);
         let (right_is_outside, right_partition) = complete_partition(right_partition, &tile_map, &loop_path);
 
-        println!("left: {}", left_partition.len());
-        println!("right: {}", right_partition.len());
+        // println!("left: {}", left_partition.len());
+        // println!("right: {}", right_partition.len());
         //println!("left outside: {left_is_outside}");
         assert!(left_is_outside != right_is_outside);
 
