@@ -2,76 +2,35 @@ pub struct Day2Part1;
 
 impl crate::days::Day for Day2Part1 {
     fn solve(&self, input: String) -> String { 
-        let games: Vec<Game> = input.lines().map(Game::parse).collect();
-
-        let available_cubes = CubeSet {
-            red: 12,
-            blue: 14,
-            green: 13,
-        };
-
-        let id_sum: u32 = games
-            .iter()
-            .filter(|g|
-                g.sets.iter()
-                    .all(|set|
-                        set.red <= available_cubes.red &&
-                        set.blue <= available_cubes.blue &&
-                        set.green <= available_cubes.green
-                    )
-            )
-            .map(|g| g.id)
-            .sum();
-
-        id_sum.to_string()
+        input.lines()
+            .enumerate()
+            .filter(|(_, l)| {
+                l.split_once(": ")
+                    .expect("line has :")
+                    .1
+                    .split("; ")
+                    .all(valid_cubeset)
+            })
+            .map(|(idx, _)| 1 + idx as u32)
+            .sum::<u32>()
+            .to_string()
     }
 }
 
-#[derive(Debug)]
-struct Game {
-    id: u32,
-    sets: Vec<CubeSet>,
-}
-
-impl Game {
-    pub fn parse(s: &str) -> Self {
-        let (game_id, sets) = s.split_once(": ").expect("valid input");
-        let id: u32 = game_id[5..].parse().expect("can parse as u32");
-        let sets: Vec<CubeSet> = sets.split("; ").map(CubeSet::parse).collect();
-
-        Self {
-            id,
-            sets,
-        }
-    }
-}
-
-#[derive(Debug)]
-struct CubeSet {
-    red: u32,
-    blue: u32,
-    green: u32,
-}
-
-impl CubeSet {
-    pub fn parse(s: &str) -> Self {
-        let mut cubes = Self {
-            red: 0,
-            blue: 0,
-            green: 0,
-        };
-
-        for color in s.split(", ") {
+fn valid_cubeset(s: &str) -> bool {
+    s.split(", ")
+        .all(|color| {
             let (amount, color) = color.split_once(' ').unwrap();
-            let amount: u32 = amount.parse().unwrap();
-            match color {
-                "red" => cubes.red = amount,
-                "blue" => cubes.blue = amount,
-                "green" => cubes.green = amount,
-                c => panic!("unexpected color name {c}"),
-            }
-        }
+            let Ok(amount) = amount.parse::<u8>() else {
+                return false;
+            };
 
-        cubes
-    }
+            match color {
+                "red" if amount <= 12 => true, 
+                "green" if amount <= 13 => true,
+                "blue" if amount <= 14 => true,
+                _ => false
+            }
+        })
 }
+
