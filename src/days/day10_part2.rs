@@ -111,7 +111,7 @@ impl crate::days::Day for Day10Part2 {
     }
 }
 
-fn complete_partition(partition: Vec<Position>, tiles: &Vec<Vec<Tile>>, loop_path: &Vec<Position>) -> (bool, Vec<Position>) {
+fn complete_partition(partition: Vec<Position>, tiles: &Vec<Vec<Tile>>, loop_path: &[Position]) -> (bool, Vec<Position>) {
     if partition.is_empty() {
         return (true, partition);
     }
@@ -138,7 +138,7 @@ fn complete_partition(partition: Vec<Position>, tiles: &Vec<Vec<Tile>>, loop_pat
                     continue;
                 }
 
-                if get_tile_at(next_pos, &tiles).is_none() {
+                if get_tile_at(next_pos, tiles).is_none() {
                     continue;
                 };
 
@@ -162,10 +162,9 @@ fn complete_partition(partition: Vec<Position>, tiles: &Vec<Vec<Tile>>, loop_pat
     (is_outside, result)
 }
 
-fn get_tile_at(pos: Position, tiles: &Vec<Vec<Tile>>) -> Option<Tile> {
+fn get_tile_at(pos: Position, tiles: &[Vec<Tile>]) -> Option<Tile> {
     tiles.get(pos.y as usize)
-        .map(|row| row.get(pos.x as usize))
-        .flatten()
+        .and_then(|row| row.get(pos.x as usize))
         .copied()
 }
 
@@ -178,7 +177,7 @@ struct Position {
 
 impl Position {
     fn in_direction(&self, d: Direction) -> Option<Self> {
-        let mut res = self.clone();
+        let mut res = *self;
 
         match d {
             Direction::North if res.y > 0 => res.y -= 1,

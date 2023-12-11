@@ -16,11 +16,11 @@ impl crate::days::Day for Day11Part1 {
             .map(|(idx, _)| (idx as i16 % cols, idx as i16 / cols))
             .collect();
 
-        let empty_cols: Vec<_> = (0..cols - 1).into_iter()
+        let empty_cols: Vec<_> = (0..cols - 1)
             .filter(|col| galaxies.iter().all(|(x, _)| x != col))
             .collect();
 
-        let empty_rows: Vec<_> = (0..rows).into_iter()
+        let empty_rows: Vec<_> = (0..rows)
             .filter(|row| galaxies.iter().all(|(_, y)| y != row))
             .collect();
 

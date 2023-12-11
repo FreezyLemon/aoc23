@@ -58,10 +58,9 @@ impl crate::days::Day for Day10Part1 {
     }
 }
 
-fn get_tile_at(pos: Position, tiles: &Vec<Vec<Tile>>) -> Option<Tile> {
+fn get_tile_at(pos: Position, tiles: &[Vec<Tile>]) -> Option<Tile> {
     tiles.get(pos.y as usize)
-        .map(|row| row.get(pos.x as usize))
-        .flatten()
+        .and_then(|row| row.get(pos.x as usize))
         .copied()
 }
 
@@ -74,7 +73,7 @@ struct Position {
 
 impl Position {
     fn in_direction(&self, d: Direction) -> Option<Self> {
-        let mut res = self.clone();
+        let mut res = *self;
 
         match d {
             Direction::North if res.y > 0 => res.y -= 1,
