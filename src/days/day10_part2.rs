@@ -120,6 +120,7 @@ fn complete_partition(partition: Vec<Position>, tiles: &Vec<Vec<Tile>>, loop_pat
 
     let mut search = partition.clone();
     let mut visited = partition.clone();
+    visited.sort_unstable();
     let mut result = partition;
     let mut is_outside = false;
 
@@ -132,9 +133,9 @@ fn complete_partition(partition: Vec<Position>, tiles: &Vec<Vec<Tile>>, loop_pat
                     continue;
                 };
 
-                if visited.contains(&next_pos) {
+                let Err(visited_new_pos) = visited.binary_search(&next_pos) else {
                     continue;
-                }
+                };
 
                 if loop_path.binary_search(&next_pos).is_ok() {
                     continue;
@@ -151,7 +152,7 @@ fn complete_partition(partition: Vec<Position>, tiles: &Vec<Vec<Tile>>, loop_pat
                     is_outside = true;
                 }
 
-                visited.push(next_pos);
+                visited.insert(visited_new_pos, next_pos);
                 result.push(next_pos);
                 next_search.push(next_pos);
             }
