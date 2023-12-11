@@ -1,82 +1,49 @@
-use std::cmp::max;
-
 pub struct Day2Part2;
 
 impl crate::days::Day for Day2Part2 {
-    fn solve(&self, input: String) -> String {
-        let games: Vec<Game> = input.lines().map(Game::parse).collect();
-
-        let set_power_sum: u32 = games
-            .iter()
-            .map(|g|
-                 g.sets.iter()
-                    .fold(CubeSet::default(),
-                        |acc, s| {
-                            CubeSet {
-                                red: max(acc.red, s.red),
-                                blue: max(acc.blue, s.blue),
-                                green: max(acc.green, s.green),
-                            }
-                        }
-                    )
-                    .power()
-            )
-            .sum();
-
-        set_power_sum.to_string()
+    fn solve(&self, input: String) -> String { 
+        input.lines()
+            .map(|l| l.split_once(": ").expect("line has :"))
+            .map(|(_, cubes)| minimum_cubeset(cubes))
+            .map(CubeSet::power)
+            .sum::<u32>()
+            .to_string()
     }
 }
 
-#[derive(Debug)]
-struct Game {
-    _id: u32,
-    sets: Vec<CubeSet>,
-}
-
-impl Game {
-    pub fn parse(s: &str) -> Self {
-        let (game_id, sets) = s.split_once(": ").expect("valid input");
-        let id: u32 = game_id[5..].parse().expect("can parse as u32");
-        let sets: Vec<CubeSet> = sets.split("; ").map(CubeSet::parse).collect();
-
-        Self {
-            _id: id,
-            sets,
-        }
-    }
-}
-
-#[derive(Debug, Default)]
 struct CubeSet {
-    red: u32,
-    blue: u32,
-    green: u32,
+    red: u8,
+    green: u8,
+    blue: u8,
 }
 
 impl CubeSet {
-    pub fn parse(s: &str) -> Self {
-        let mut cubes = Self {
+    fn empty() -> Self {
+        Self {
             red: 0,
-            blue: 0,
             green: 0,
-        };
-
-        for color in s.split(", ") {
-            let (amount, color) = color.split_once(' ').unwrap();
-            let amount: u32 = amount.parse().unwrap();
-            match color {
-                "red" => cubes.red = amount,
-                "blue" => cubes.blue = amount,
-                "green" => cubes.green = amount,
-                c => panic!("unexpected color name {c}"),
-            }
+            blue: 0,
         }
-
-        cubes
     }
 
-    pub fn power(&self) -> u32 {
-        self.red * self.blue * self.green
+    fn power(self) -> u32 {
+        self.red as u32 * self.green as u32 * self.blue as u32
     }
+}
+
+fn minimum_cubeset(s: &str) -> CubeSet {
+    s.split([',', ';'])
+        .map(|color| color.trim_start().split_once(' ').unwrap())
+        .map(|(amount, color)| (amount.parse::<u8>().unwrap(), color))
+        .fold(CubeSet::empty(), |mut set, (amount, color)| {
+            match color {
+                "red" if amount > set.red => set.red = amount,
+                "green" if amount > set.green => set.green = amount,
+                "blue" if amount > set.blue => set.blue = amount,
+                _ => {}
+            }
+
+            set
+        })
 }
 
