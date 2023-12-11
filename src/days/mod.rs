@@ -20,11 +20,10 @@ macro_rules! import_days {
 }
 
 // normal modules, dayXX_partY
-import_days!(01, 02, 03, 04, 05, 06, 07, 08, 09, 10,);
+import_days!(01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11,);
 
 // custom modules
 import_module!(day01_part2_malox);
-import_module!(day11_part1);
 
 pub trait Day {
     fn solve(&self, input: String) -> String;
