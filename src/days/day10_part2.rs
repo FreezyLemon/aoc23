@@ -80,17 +80,19 @@ impl crate::days::Day for Day10Part2 {
 
         // The partitions are not complete yet.
         // We remove duplicates and move on to finding all adjacent non-loop tiles
+        loop_path.sort_unstable();
+
         left_partition.sort_unstable();
         left_partition.dedup();
         let left_partition: Vec<Position> = left_partition.into_iter()
-            .filter(|pos| !loop_path.contains(pos))
+            .filter(|pos| loop_path.binary_search(pos).is_err())
             .collect();
         // println!("left: {}", left_partition.len());
 
         right_partition.sort_unstable();
         right_partition.dedup();
         let right_partition: Vec<Position> = right_partition.into_iter()
-            .filter(|pos| !loop_path.contains(pos))
+            .filter(|pos| loop_path.binary_search(pos).is_err())
             .collect();
 
         let (left_is_outside, left_partition) = complete_partition(left_partition, &tile_map, &loop_path);
@@ -134,7 +136,7 @@ fn complete_partition(partition: Vec<Position>, tiles: &Vec<Vec<Tile>>, loop_pat
                     continue;
                 }
 
-                if loop_path.contains(&next_pos) {
+                if loop_path.binary_search(&next_pos).is_ok() {
                     continue;
                 }
 
