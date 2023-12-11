@@ -8,7 +8,11 @@ macro_rules! make_day_string {
         format!("d{}p{}", $d, $p)
     };
     ($d:literal, $p:literal, $suffix:expr) => {
-        format!("{}-{}", make_day_string!($d, $p), std::primitive::str::to_lowercase($suffix))
+        format!(
+            "{}-{}",
+            make_day_string!($d, $p),
+            std::primitive::str::to_lowercase($suffix)
+        )
     };
 }
 
@@ -50,7 +54,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
         map_entry!(11, 1),
         map_entry!(11, 2),
     ]);
-        
+
     let mut args = std::env::args().skip(1);
     let Some(day) = args.next() else {
         return Err(Box::new(ProgramError::NotEnoughArguments));
@@ -82,12 +86,15 @@ impl std::fmt::Display for ProgramError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         use ProgramError::*;
 
-        write!(f, "{}", match self {
-            NotEnoughArguments => "provide at least one argument",
-            NoImplementationFound => "no implementation found (is it registered?)",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                NotEnoughArguments => "provide at least one argument",
+                NoImplementationFound => "no implementation found (is it registered?)",
+            }
+        )
     }
 }
 
 impl std::error::Error for ProgramError {}
-

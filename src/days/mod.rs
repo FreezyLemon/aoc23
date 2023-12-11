@@ -28,4 +28,3 @@ import_module!(day01_part2_malox);
 pub trait Day {
     fn solve(&self, input: String) -> String;
 }
-
