@@ -32,7 +32,7 @@ impl crate::days::Day for Day8Part2 {
             })
             .collect();
 
-        let end_steps_per_node: Vec<i64> = path_map
+        path_map
             .iter()
             .filter(|(name, _)| name.ends_with('A'))
             .map(|(_name, node)| {
@@ -54,28 +54,21 @@ impl crate::days::Day for Day8Part2 {
 
                 steps
             })
-            .collect();
-
-        lcm(end_steps_per_node).to_string()
+            .reduce(lcm)
+            .unwrap()
+            .to_string()
     }
 }
 
-fn lcm(mut ints: Vec<i64>) -> i64 {
-    assert!(ints.len() > 1);
+fn lcm(a: i64, b: i64) -> i64 {
+    (a * b).abs() / gcd(a, b)
+}
 
-    let orig = ints.clone();
-    loop {
-        let v = ints[0];
-        if ints.iter().all(|&x| x == v) {
-            return v;
-        }
-
-        let (idx, _) = ints.iter()
-            .enumerate()
-            .min_by_key(|(_, &val)| val)
-            .unwrap();
-
-        ints[idx] += orig[idx];
+fn gcd(a: i64, b: i64) -> i64 {
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
     }
 }
 
