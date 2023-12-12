@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 pub struct Day8Part2;
 
 impl crate::days::Day for Day8Part2 {
@@ -12,44 +10,61 @@ impl crate::days::Day for Day8Part2 {
                 'L' => Direction::Left,
                 _ => panic!("invalid input"),
             })
-        .collect();
+            .collect();
+
+        let mut start_ids = Vec::new();
         
-        lines_iter.next().unwrap(); // ignore empty line
-        
-        let path_map: HashMap<String, Node> = lines_iter.map(|l| l.split_once('=').expect("line has ="))
+        let mut raw_nodes: Vec<RawNode> = lines_iter.skip(1) // empty line
+            .map(|l| l.split_once('=').expect("line has ="))
             .map(|(name, paths)| {
-                let name = name.trim().to_string();
                 let (l, r) = paths.trim().split_once(',').expect("line has ,");
-                
-                (
-                    name.clone(),
-                    Node {
-                        _name: name,
-                        left: l.trim_start_matches('(').to_string(),
-                        right: r.trim().trim_end_matches(')').to_string(),
-                    }
-                )
+
+                RawNode {
+                    name: name.trim(),
+                    left: l.trim_start_matches('('),
+                    right: r.trim().trim_end_matches(')'),
+                }
             })
             .collect();
 
-        path_map
-            .iter()
-            .filter(|(name, _)| name.ends_with('A'))
-            .map(|(_name, node)| {
+        raw_nodes.sort_unstable_by_key(|rn| rn.name);
+        let nodes: Vec<Node> = raw_nodes.iter()
+            .enumerate()
+            .map(|(id, raw_node)| {
+                let left = raw_nodes.binary_search_by_key(&raw_node.left, |rn| rn.name).unwrap();
+                let right = raw_nodes.binary_search_by_key(&raw_node.right, |rn| rn.name).unwrap();
+
+                if raw_node.name.ends_with('A') {
+                    start_ids.push(id);
+                }
+                
+                let is_end = raw_node.name.ends_with('Z');
+
+                Node {
+                    left: left as u32,
+                    right: right as u32,
+                    is_end,
+                }
+            })
+            .collect();
+
+        start_ids.into_iter()
+            .map(|id| &nodes[id])
+            .map(|n| {
                 let mut steps = 0;
-                let mut curr_node = node;
-                for dir in instructions.iter().cycle() {
-                    let next_node_name = match dir {
-                        Direction::Left => &curr_node.left,
-                        Direction::Right => &curr_node.right,
+                let mut curr_node = n;
+                for instr in instructions.iter().cycle() {
+                    let next_id = match instr {
+                        Direction::Left => curr_node.left,
+                        Direction::Right => curr_node.right,
                     };
 
-                    steps += 1;
-
-                    if next_node_name.ends_with('Z') {
+                    if curr_node.is_end {
                         break;
                     }
-                    curr_node = path_map.get(next_node_name).unwrap();
+
+                    steps += 1;
+                    curr_node = &nodes[next_id as usize];
                 }
 
                 steps
@@ -72,11 +87,17 @@ fn gcd(a: i64, b: i64) -> i64 {
     }
 }
 
+struct RawNode<'input> {
+    name: &'input str,
+    left: &'input str,
+    right: &'input str,
+}
+
 #[derive(Debug)]
 struct Node {
-    _name: String,
-    left: String,
-    right: String,
+    left: u32,
+    right: u32,
+    is_end: bool,
 }
 
 #[derive(Debug)]
