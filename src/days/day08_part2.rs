@@ -13,16 +13,13 @@ impl crate::days::Day for Day8Part2 {
             .collect();
 
         let mut start_ids = Vec::new();
-        
-        let mut raw_nodes: Vec<RawNode> = lines_iter.skip(1) // empty line
-            .map(|l| l.split_once('=').expect("line has ="))
-            .map(|(name, paths)| {
-                let (l, r) = paths.trim().split_once(',').expect("line has ,");
 
+        let mut raw_nodes: Vec<RawNode> = lines_iter.skip(1) // empty line
+            .map(|line| {
                 RawNode {
-                    name: name.trim(),
-                    left: l.trim_start_matches('('),
-                    right: r.trim().trim_end_matches(')'),
+                    name: &line[0..][..3],
+                    left: &line[7..][..3],
+                    right: &line[12..][..3],
                 }
             })
             .collect();
