@@ -40,8 +40,10 @@ macro_rules! bench_group {
     };
 }
 
-bench_days!(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,);
-bench_group!(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,);
+bench_days!(1, 2, 3, 4, 6, 7, 8, 9, 10, 11,);
+bench_group!(1, 2, 3, 4, 6, 7, 8, 9, 10, 11,);
+
+bench_for_day!(5, 1);
 
 fn bench_day1_part2_malox(c: &mut Criterion) {
     c.bench_function("day 1 part 2 malox", |b| {
@@ -52,6 +54,6 @@ fn bench_day1_part2_malox(c: &mut Criterion) {
     });
 }
 
-criterion_group!(rest, bench_day1_part2_malox);
+criterion_group!(rest, bench_day1_part2_malox, bench_day5_part1);
 
 criterion_main!(benches, rest);
