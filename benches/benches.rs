@@ -40,8 +40,8 @@ macro_rules! bench_group {
     };
 }
 
-bench_days!(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,);
-bench_group!(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,);
+bench_days!(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,);
+bench_group!(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,);
 
 bench_for_day!(13, 1);
 
