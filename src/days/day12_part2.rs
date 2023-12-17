@@ -33,7 +33,7 @@ impl crate::days::Day for Day12Part2 {
     }
 }
 
-fn munch(pattern: &[u8], arrangements: &[i32], orig_pat: *const u8, orig_arrng: *const i32, cache: &mut HashMap<(isize, isize), i64>) -> i64 {
+fn munch(pattern: &[u8], arrangements: &[i32], orig_pat: *const u8, orig_arrng: *const i32, cache: &mut HashMap<(i32, i32), i64>) -> i64 {
     if arrangements.is_empty() {
         if pattern.contains(&b'#') {
             // there are still unused good springs,
@@ -66,8 +66,8 @@ fn munch(pattern: &[u8], arrangements: &[i32], orig_pat: *const u8, orig_arrng: 
                 Some(_) => {
                     let next_pat = &offset_pat[1 + next_arrng_offset..];
                     let next_arrng = &arrangements[1..];
-                    let pat_offset = unsafe { next_pat.as_ptr().offset_from(orig_pat) };
-                    let arrng_offset = unsafe { next_arrng.as_ptr().offset_from(orig_arrng) };
+                    let pat_offset = unsafe { next_pat.as_ptr().offset_from(orig_pat) } as i32;
+                    let arrng_offset = unsafe { next_arrng.as_ptr().offset_from(orig_arrng) } as i32;
 
                     if let Some(v) = cache.get(&(pat_offset, arrng_offset)) {
                         sum += v;
