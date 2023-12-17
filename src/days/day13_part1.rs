@@ -28,13 +28,8 @@ impl crate::days::Day for Day13Part1 {
                 let pat_horz: Vec<u32> = lines.into_iter()
                     .map(str::char_indices)
                     .map(|char_indices| char_indices
-                        .fold(0_u32, |acc, (x, char)| {
-                            if char == '#' {
-                                acc | (1 << x)
-                            } else {
-                                acc
-                            }
-                        })
+                        .filter(|(_, char)| *char == '#')
+                        .fold(0_u32, |acc, (x, _)| acc | (1 << x))
                     )
                     .collect();
 
