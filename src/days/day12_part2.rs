@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub struct Day12Part2;
 
 impl crate::days::Day for Day12Part2 {
@@ -21,18 +23,17 @@ impl crate::days::Day for Day12Part2 {
 
                 (pattern, arrangement)
             })
-            .enumerate()
-            .map(|(idx, (pat, arrng))| {
-                println!("starting line {}", idx + 1);
+            .map(|(pat, arrng)| {
+                let mut cache = HashMap::new();
                 let pat = pat.trim_matches('.').as_bytes();
-                munch(pat, &arrng)
+                munch(pat, &arrng, pat.as_ptr(), arrng.as_ptr(), &mut cache)
             })
-            .sum::<i32>()
+            .sum::<i64>()
             .to_string()
     }
 }
 
-fn munch(pattern: &[u8], arrangements: &[i32]) -> i32 {
+fn munch(pattern: &[u8], arrangements: &[i32], orig_pat: *const u8, orig_arrng: *const i32, cache: &mut HashMap<(isize, isize), i64>) -> i64 {
     if arrangements.is_empty() {
         if pattern.contains(&b'#') {
             // there are still unused good springs,
@@ -49,7 +50,7 @@ fn munch(pattern: &[u8], arrangements: &[i32]) -> i32 {
         return 0;
     }
 
-    let next_arrng = arrangements[0] as usize;
+    let next_arrng_offset = arrangements[0] as usize;
     let max_offset = match pattern.iter().enumerate().find(|(_, b)| **b == b'#') {
         Some((idx, _)) => std::cmp::min(max_offset, idx as i32),
         None => max_offset,
@@ -58,11 +59,24 @@ fn munch(pattern: &[u8], arrangements: &[i32]) -> i32 {
     let mut sum = 0;
     for offset in 0..=max_offset as usize {
         let offset_pat = &pattern[offset..];
-        if can_be_contiguous(&offset_pat[..next_arrng]) {
-            match offset_pat[next_arrng..].get(0) {
+        if can_be_contiguous(&offset_pat[..next_arrng_offset]) {
+            match offset_pat[next_arrng_offset..].get(0) {
                 None if arrangements.len() == 1 => sum += 1, // end of pattern
                 Some(b'#') => continue, // arrangements cannot be divided by a #
-                Some(_) => sum += munch(&offset_pat[1 + next_arrng..], &arrangements[1..]),
+                Some(_) => {
+                    let next_pat = &offset_pat[1 + next_arrng_offset..];
+                    let next_arrng = &arrangements[1..];
+                    let pat_offset = unsafe { next_pat.as_ptr().offset_from(orig_pat) };
+                    let arrng_offset = unsafe { next_arrng.as_ptr().offset_from(orig_arrng) };
+
+                    if let Some(v) = cache.get(&(pat_offset, arrng_offset)) {
+                        sum += v;
+                    } else {
+                        let new_val = munch(next_pat, next_arrng, orig_pat, orig_arrng, cache);
+                        sum += new_val;
+                        cache.insert((pat_offset, arrng_offset), new_val);
+                    }
+                },
                 _ => {}
             }
         }
