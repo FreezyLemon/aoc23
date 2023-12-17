@@ -48,7 +48,7 @@ fn munch(pattern: &[u8], arrangements: &[i32]) -> i32 {
     for offset in 0..=max_offset as usize {
         let offset_pat = &pattern[offset..];
         if can_be_contiguous(&offset_pat[..next_arrng]) {
-            match offset_pat[next_arrng..].get(0) {
+            match offset_pat[next_arrng..].first() {
                 None if arrangements.len() == 1 => sum += 1, // end of pattern
                 Some(b'#') => continue, // arrangements cannot be divided by a #
                 Some(_) => sum += munch(&offset_pat[1 + next_arrng..], &arrangements[1..]),
