@@ -1,7 +1,7 @@
 pub struct Day1Part1;
 
 impl crate::days::Day for Day1Part1 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let calibration_value: u32 = input
             .lines()
             .map(|l| {

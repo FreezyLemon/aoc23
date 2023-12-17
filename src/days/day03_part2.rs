@@ -4,7 +4,7 @@ pub struct Day3Part2;
 // (the input is a square)
 
 impl crate::days::Day for Day3Part2 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let gear_candidates: Vec<(usize, usize)> = input.lines()
             .map(str::chars)
             .map(Iterator::enumerate)

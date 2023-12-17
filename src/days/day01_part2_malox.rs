@@ -1,7 +1,7 @@
 pub struct Day1Part2Malox;
 
 impl crate::days::Day for Day1Part2Malox {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let mut number_digit_map = vec![
             (String::from("one"), 1),
             (String::from("two"), 2),

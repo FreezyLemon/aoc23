@@ -26,5 +26,5 @@ import_days!(01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13,);
 import_module!(day01_part2_malox);
 
 pub trait Day {
-    fn solve(&self, input: String) -> String;
+    fn solve(&self, input: &str) -> String;
 }

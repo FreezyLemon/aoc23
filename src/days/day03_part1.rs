@@ -4,7 +4,7 @@ pub struct Day3Part1;
 // (the input is a square)
 
 impl crate::days::Day for Day3Part1 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let lines: Vec<_> = input.lines().collect();
         
         let symbol_idxs: Vec<(i32, i32)> = lines.iter()

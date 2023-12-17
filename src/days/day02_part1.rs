@@ -1,7 +1,7 @@
 pub struct Day2Part1;
 
 impl crate::days::Day for Day2Part1 {
-    fn solve(&self, input: String) -> String { 
+    fn solve(&self, input: &str) -> String { 
         input.lines()
             .enumerate()
             .filter(|(_, l)| {

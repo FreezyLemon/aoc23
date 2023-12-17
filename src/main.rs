@@ -78,7 +78,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let runs: u32 = args.next().unwrap_or("1".into()).parse()?;
     let mut day_result = String::from("Unknown (day was not run)"); 
     for _ in 0..runs {
-        day_result = day_impl.solve(input.clone());
+        day_result = day_impl.solve(&input);
     }
     println!("Result of {day}: {day_result}");
 

@@ -3,7 +3,7 @@ use std::{cmp::{max, min}, ops::RangeInclusive};
 pub struct Day5Part2;
 
 impl crate::days::Day for Day5Part2 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let mut chunks_iter = input.split("\n\n");
 
         let (_, seed_range_str) = chunks_iter.next().expect("has content").split_once(':').expect("has :");

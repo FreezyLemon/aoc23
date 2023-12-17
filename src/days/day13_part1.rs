@@ -2,7 +2,7 @@ pub struct Day13Part1;
 
 // assumption: all cols (rows) inside a pattern are of the same length
 impl crate::days::Day for Day13Part1 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let patterns: Vec<_> = input.split("\n\n")
             .map(|pat| {
                 let lines: Vec<&str> = pat.lines().collect();

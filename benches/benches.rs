@@ -19,7 +19,7 @@ macro_rules! bench_for_day {
                     let day = [<Day $d Part $p>];
                     let input = get_input(&format!("d{}p{}", $d, $p), None).unwrap();
 
-                    b.iter(|| day.solve(black_box(input.clone())));
+                    b.iter(|| day.solve(black_box(&input)));
                 });
             }
         }
@@ -50,7 +50,7 @@ fn bench_day1_part2_malox(c: &mut Criterion) {
         let day = Day1Part2Malox;
         let input = get_input("d1p2", None).unwrap();
 
-        b.iter(|| day.solve(black_box(input.clone())));
+        b.iter(|| day.solve(black_box(&input)));
     });
 }
 

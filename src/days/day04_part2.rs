@@ -1,7 +1,7 @@
 pub struct Day4Part2;
 
 impl crate::days::Day for Day4Part2 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let card_count = input.lines().count();
 
         input.lines()

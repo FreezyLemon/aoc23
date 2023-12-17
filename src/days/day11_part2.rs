@@ -1,7 +1,7 @@
 pub struct Day11Part2;
 
 impl crate::days::Day for Day11Part2 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let cols = 1 + input.find('\n').expect("has LF byte") as i32;
         let rows = input.len() as i32 / cols;
 

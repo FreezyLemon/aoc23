@@ -1,7 +1,7 @@
 pub struct Day1Part2;
 
 impl crate::days::Day for Day1Part2 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let mut numbers = Vec::new();
         for line in input.lines() {
             let mut v = Vec::new();

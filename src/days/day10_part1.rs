@@ -1,7 +1,7 @@
 pub struct Day10Part1;
 
 impl crate::days::Day for Day10Part1 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let tile_map: Vec<Vec<_>> = input.lines()
             .map(str::chars)
             .map(|chars| chars.map(Tile::from_char).collect())

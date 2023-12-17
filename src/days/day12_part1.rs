@@ -1,7 +1,7 @@
 pub struct Day12Part1;
 
 impl crate::days::Day for Day12Part1 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         input.lines()
             .map(|line| {
                 let (pattern, arrangement) = line.split_once(' ').expect("input has whitespace");

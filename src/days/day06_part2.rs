@@ -1,7 +1,7 @@
 pub struct Day6Part2;
 
 impl crate::days::Day for Day6Part2 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let (time, distance) = input.split_once('\n').expect("has 1+ newline");
 
         let (_, time) = time.split_once(':').expect("has :");

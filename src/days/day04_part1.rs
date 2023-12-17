@@ -1,7 +1,7 @@
 pub struct Day4Part1;
 
 impl crate::days::Day for Day4Part1 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         input.lines()
             .map(|l| l.split_once(':').expect("input contains :"))
             .map(|(_card, rest)| rest.split_once('|').expect("input contains |"))

@@ -1,7 +1,7 @@
 pub struct Day9Part2;
 
 impl crate::days::Day for Day9Part2 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         input.lines()
             .map(str::split_ascii_whitespace)
             .map(|split| {

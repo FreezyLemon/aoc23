@@ -3,7 +3,7 @@ use std::collections::HashMap;
 pub struct Day8Part1;
 
 impl crate::days::Day for Day8Part1 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let mut lines_iter = input.lines();
         let instructions = lines_iter.next().expect("has at least one line")
             .chars()

@@ -1,7 +1,7 @@
 pub struct Day2Part2;
 
 impl crate::days::Day for Day2Part2 {
-    fn solve(&self, input: String) -> String { 
+    fn solve(&self, input: &str) -> String { 
         input.lines()
             .map(|l| l.split_once(": ").expect("line has :"))
             .map(|(_, cubes)| minimum_cubeset(cubes))

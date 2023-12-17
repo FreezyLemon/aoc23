@@ -1,7 +1,7 @@
 pub struct Day8Part2;
 
 impl crate::days::Day for Day8Part2 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let mut lines_iter = input.lines();
         let instructions: Vec<Direction> = lines_iter.next().expect("has at least one line")
             .chars()

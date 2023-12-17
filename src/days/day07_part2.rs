@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 pub struct Day7Part2;
 
 impl crate::days::Day for Day7Part2 {
-    fn solve(&self, input: String) -> String {
+    fn solve(&self, input: &str) -> String {
         let mut parsed: Vec<_> = input.lines()
             .map(|l| l.split_once(' ').expect("input has ' '"))
             .map(|(hand, bid)| (hand.chars().map(CamelCard::parse).collect::<Vec<_>>(), bid.parse::<i32>().expect("is int")))
