@@ -13,7 +13,7 @@ impl crate::days::Day for Day12Part1 {
                 (pattern, arrangement)
             })
             .map(|(pat, arrng)| {
-                let pat = pat.trim_matches('.');
+                let pat = pat.trim_matches('.').as_bytes();
                 munch(pat, &arrng)
             })
             .sum::<i32>()
@@ -21,9 +21,9 @@ impl crate::days::Day for Day12Part1 {
     }
 }
 
-fn munch(pattern: &str, arrangements: &[i32]) -> i32 {
+fn munch(pattern: &[u8], arrangements: &[i32]) -> i32 {
     if arrangements.is_empty() {
-        if pattern.contains('#') {
+        if pattern.contains(&b'#') {
             // there are still unused good springs,
             // so we can't finish the pattern here
             return 0;
@@ -39,7 +39,7 @@ fn munch(pattern: &str, arrangements: &[i32]) -> i32 {
     }
 
     let next_arrng = arrangements[0] as usize;
-    let max_offset = match pattern.match_indices('#').nth(0) {
+    let max_offset = match pattern.iter().enumerate().find(|(_, b)| **b == b'#') {
         Some((idx, _)) => std::cmp::min(max_offset, idx as i32),
         None => max_offset,
     };
@@ -48,9 +48,9 @@ fn munch(pattern: &str, arrangements: &[i32]) -> i32 {
     for offset in 0..=max_offset as usize {
         let offset_pat = &pattern[offset..];
         if can_be_contiguous(&offset_pat[..next_arrng]) {
-            match offset_pat[next_arrng..].chars().nth(0) {
+            match offset_pat[next_arrng..].get(0) {
                 None if arrangements.len() == 1 => sum += 1, // end of pattern
-                Some('#') => continue, // arrangements cannot be divided by a #
+                Some(b'#') => continue, // arrangements cannot be divided by a #
                 Some(_) => sum += munch(&offset_pat[1 + next_arrng..], &arrangements[1..]),
                 _ => {}
             }
@@ -60,6 +60,6 @@ fn munch(pattern: &str, arrangements: &[i32]) -> i32 {
     sum
 }
 
-fn can_be_contiguous(s: &str) -> bool {
-    !s.contains('.')
+fn can_be_contiguous(s: &[u8]) -> bool {
+    !s.contains(&b'.')
 }
