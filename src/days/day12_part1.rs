@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 pub struct Day12Part1;
 
 impl crate::days::Day for Day12Part1 {
