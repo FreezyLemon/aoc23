@@ -17,11 +17,7 @@ impl crate::days::Day for Day13Part1 {
                 let mut pat_vert = vec![0u32; lines[0].len()];
                 for col in &mut pat_vert.iter_mut() {
                     for (y, chars) in line_chars.iter_mut().enumerate() {
-                        let Some(c) = chars.next() else {
-                            panic!("possibly invalid input");
-                        };
-    
-                        if c == '#' {
+                        if chars.next().expect("valid input") == '#' {
                             *col |= 1 << y;
                         }
                     }
