@@ -36,7 +36,7 @@ impl crate::days::Day for Day13Part1 {
                 ((row_len, pat_horz), (col_len, pat_vert))
             })
             .collect();
-    
+
         patterns.into_iter()
             .map(|((h_len, horz), (v_len, vert))| {
                 if let Some(col_no) = find_reflection(&horz, h_len) {
