@@ -1,10 +1,12 @@
 use std::{cmp::{max, min}, ops::RangeInclusive};
 
+use crate::DOUBLE_LINE_SEPARATOR;
+
 pub struct Day5Part2;
 
 impl crate::days::Day for Day5Part2 {
     fn solve(&self, input: &str) -> String {
-        let mut chunks_iter = input.split("\n\n");
+        let mut chunks_iter = input.split(DOUBLE_LINE_SEPARATOR);
 
         let (_, seed_range_str) = chunks_iter.next().expect("has content").split_once(':').expect("has :");
 

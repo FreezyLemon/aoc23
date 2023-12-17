@@ -1,15 +1,17 @@
+use crate::LINE_SEPARATOR;
+
 pub struct Day11Part2;
 
 impl crate::days::Day for Day11Part2 {
     fn solve(&self, input: &str) -> String {
-        let cols = 1 + input.find('\n').expect("has LF byte") as i32;
+        let cols = (LINE_SEPARATOR.len() + input.find(LINE_SEPARATOR).expect("has LF byte")) as i32;
         let rows = input.len() as i32 / cols;
 
         debug_assert!(
             input.bytes().skip(cols as usize - 1).step_by(cols as usize).all(|b| b == b'\n'),
             "rows differ in length",
         );
-        debug_assert_eq!(cols - 1, rows, "input is not square"); // maybe unneeded
+        debug_assert_eq!(cols - LINE_SEPARATOR.len() as i32, rows, "input is not square"); // maybe unneeded
 
 
         let galaxies: Vec<_> = input.match_indices('#')

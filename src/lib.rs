@@ -2,6 +2,16 @@ mod days;
 
 pub use crate::days::*;
 
+#[cfg(unix)]
+pub const LINE_SEPARATOR: &str = "\n";
+#[cfg(not(unix))]
+pub const LINE_SEPARATOR: &str = "\r\n";
+
+#[cfg(unix)]
+pub const DOUBLE_LINE_SEPARATOR: &str = "\n\n";
+#[cfg(not(unix))]
+pub const DOUBLE_LINE_SEPARATOR: &str = "\r\n\r\n";
+
 pub fn get_input(
     day: &str,
     maybe_input: Option<String>,

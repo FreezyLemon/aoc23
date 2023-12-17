@@ -1,8 +1,10 @@
+use crate::DOUBLE_LINE_SEPARATOR;
+
 pub struct Day5Part1;
 
 impl crate::days::Day for Day5Part1 {
     fn solve(&self, input: &str) -> String {
-        let mut chunks_iter = input.split("\n\n");
+        let mut chunks_iter = input.split(&DOUBLE_LINE_SEPARATOR);
 
         let mut seeds: Vec<i64> = chunks_iter.next().expect("has content")
             .split_once(':').expect("has :")
