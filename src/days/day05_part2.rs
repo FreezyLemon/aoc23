@@ -14,10 +14,11 @@ impl crate::days::Day for Day5Part2 {
             .map(Result::unwrap)
             .collect();
         let mut seed_ranges: Vec<_> = ints.chunks_exact(2)
-            .map(|c| (c[0]..=c[0] - 1 + c[1], 0))
+            .map(|c| c[0]..=c[0] - 1 + c[1])
             .collect();
 
-        let map_categories = chunks_iter.map(|c| c.lines().skip(1))
+        let map_categories = chunks_iter
+            .map(|c| c.lines().skip(1))
             .map(|lines| {
                 lines.map(str::split_ascii_whitespace)
                      .map(|words| {
@@ -35,12 +36,10 @@ impl crate::days::Day for Day5Part2 {
 
         for category in map_categories {
             let mut next_ranges = Vec::new();
-            println!("{category:?}");
-            println!();
             for (map_range, offset) in category {
                 let mut unmapped_ranges = Vec::new();
-                for (seed_range, val) in seed_ranges {
-                    let (unmapped, mapped) = apply_map(seed_range, map_range.clone(), val, offset);
+                for seed_range in seed_ranges {
+                    let (unmapped, mapped) = apply_map(seed_range, map_range.clone(), offset);
                     next_ranges.extend(mapped);
                     unmapped_ranges.extend(unmapped);
                 }
@@ -51,18 +50,15 @@ impl crate::days::Day for Day5Part2 {
             seed_ranges.extend(next_ranges);
         }
 
-        let final_vals: Vec<i64> = seed_ranges.into_iter()
-            .map(|(range, offset)| range.start() + offset)
-            .collect();
-
-        final_vals.into_iter()
+        seed_ranges.into_iter()
+            .map(|seed_range| *seed_range.start())
             .min()
             .unwrap()
             .to_string()
     }
 }
 
-fn apply_map(range: RangeInclusive<i64>, map: RangeInclusive<i64>, val: i64, map_offset: i64) -> (Vec<(RangeInclusive<i64>, i64)>, Vec<(RangeInclusive<i64>, i64)>) {
+fn apply_map(range: RangeInclusive<i64>, map: RangeInclusive<i64>, map_offset: i64) -> (Vec<RangeInclusive<i64>>, Vec<RangeInclusive<i64>>) {
     let mut unmapped = Vec::new();
     let mut mapped = Vec::new();
 
@@ -70,17 +66,17 @@ fn apply_map(range: RangeInclusive<i64>, map: RangeInclusive<i64>, val: i64, map
     let upper_bound = *min(range.end(), map.end());
 
     if upper_bound >= lower_bound {
-        mapped.push((lower_bound..=upper_bound, val + map_offset));
+        mapped.push(lower_bound + map_offset..=upper_bound + map_offset);
 
         if *range.start() < lower_bound {
-            unmapped.push((*range.start()..=lower_bound - 1, val));
+            unmapped.push(*range.start()..=lower_bound - 1);
         }
 
         if upper_bound < *range.end() {
-            unmapped.push((upper_bound + 1..=*range.end(), val));
+            unmapped.push(upper_bound + 1..=*range.end());
         }
     } else {
-        unmapped.push((range, val));
+        unmapped.push(range);
     }
 
     (unmapped, mapped)
