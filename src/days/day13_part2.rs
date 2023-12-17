@@ -37,11 +37,11 @@ impl crate::days::Day for Day13Part2 {
             })
             .collect();
     
-        let _a = patterns.into_iter()
+        patterns.into_iter()
             .map(|((h_len, horz), (v_len, vert))| {
-                let base_reflection = if let Some(col_no) = find_reflection(&horz, h_len) {
+                let base_reflection = if let Some(col_no) = find_reflection(&horz, h_len, None) {
                     Reflection::Column(col_no)
-                } else if let Some(row_no) = find_reflection(&vert, v_len) {
+                } else if let Some(row_no) = find_reflection(&vert, v_len, None) {
                     Reflection::Row(row_no)
                 } else {
                     panic!("can't find reflection for a pattern");
@@ -51,18 +51,19 @@ impl crate::days::Day for Day13Part2 {
             })
             .map(|(old_reflection, (h_len, horz), (v_len, vert))| {
                 let mut new_reflection = None;
+                let mut horz_old = None;
+                let mut vert_old = None;
+
+                match old_reflection {
+                    Reflection::Column(c) => horz_old = Some(c),
+                    Reflection::Row(r) => vert_old = Some(r),
+                }
                 for i in 0..horz.len() {
                     for j in 0..h_len {
                         let mut horz = horz.clone();
                         horz[i] ^= 1 << j;
-                        if let Some(col_no) = find_reflection(&horz, h_len) {
-                            if let Reflection::Column(old_col_no) = old_reflection {
-                                if col_no != old_col_no {
-                                    new_reflection = Some(Reflection::Column(col_no));
-                                }
-                            } else {
-                                new_reflection = Some(Reflection::Column(col_no));
-                            }
+                        if let Some(col_no) = find_reflection(&horz, h_len, horz_old) {
+                            new_reflection = Some(Reflection::Column(col_no));
                         }
                     }
                 }
@@ -71,35 +72,37 @@ impl crate::days::Day for Day13Part2 {
                     for j in 0..v_len {
                         let mut vert = vert.clone();
                         vert[i] ^= 1 << j;
-                        if let Some(row_no) = find_reflection(&vert, v_len) {
-                            if let Reflection::Row(old_row_no) = old_reflection {
-                                if row_no != old_row_no {
-                                    new_reflection = Some(Reflection::Row(row_no));
-                                }
-                            } else {
-                                new_reflection = Some(Reflection::Row(row_no));
-                            }
+                        if let Some(row_no) = find_reflection(&vert, v_len, vert_old) {
+                            new_reflection = Some(Reflection::Row(row_no));
                         }
                     }
                 }
 
-                println!("{old_reflection:?}");
-                new_reflection.expect("could find new reflection")
+                new_reflection.expect("could find new reflection").get_index()
             })
-            .collect::<Vec<_>>();
-        
-        "".into()
+            .sum::<usize>()
+            .to_string()
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum Reflection {
     Column(usize),
     Row(usize),
 }
 
-fn find_reflection(pattern: &[u32], pat_len: usize) -> Option<usize> {
+impl Reflection {
+    fn get_index(self) -> usize {
+        match self {
+            Reflection::Column(c) => c,
+            Reflection::Row(r) => 100 * r,
+        }
+    }
+}
+
+fn find_reflection(pattern: &[u32], pat_len: usize, old_reflection: Option<usize>) -> Option<usize> {
     (1..pat_len)
+        .filter(|idx| old_reflection.map_or(true, |r| r != *idx))
         .find(|&candidate_idx| {
             pattern.iter()
                 .all(|row_or_col| {
