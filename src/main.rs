@@ -59,6 +59,8 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
         map_entry!(13, 2),
         map_entry!(14, 1),
         map_entry!(14, 2),
+        map_entry!(15, 1),
+        map_entry!(15, 2),
     ]);
 
     let mut args = std::env::args().skip(1);
