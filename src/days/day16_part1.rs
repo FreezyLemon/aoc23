@@ -1,9 +1,6 @@
 use std::cmp::min;
 use std::collections::HashSet;
 
-use typed_arena::Arena;
-
-use crate::graph::Node;
 use crate::LINE_SEPARATOR;
 
 pub struct Day16Part1;
@@ -32,48 +29,34 @@ impl crate::days::Day for Day16Part1 {
             .min_by_key(|n| n.location.col)
             .expect("input has a tile in the first row");
 
-        let arena = Arena::new();
-        let root = Node::new((first_node.clone(), Direction::West), &arena);
-
-        let energized = construct_graph(root, &arena, &important_tiles, cols as Coordinate, rows);
+        let energized = construct_graph(first_node.clone(), &important_tiles, cols as Coordinate, rows);
         energized.to_string()
     }
 }
 
-type MirrorNode<'a> = Node<'a, (NodeData, Direction)>;
+// type MirrorNode<'a> = Node<'a, (NodeData, Direction)>;
 
-fn construct_graph<'a>(root: &'a MirrorNode<'a>, arena: &'a Arena<MirrorNode<'a>>, important_tiles: &[NodeData], cols: Coordinate, rows: Coordinate) -> i32 {
+fn construct_graph<'a>(start: NodeData, important_tiles: &[NodeData], cols: Coordinate, rows: Coordinate) -> i32 {
     let mut energized_tiles = HashSet::new();
-    for c in 0..root.data.0.location.col {
-        energized_tiles.insert(Location { col: c, row: root.data.0.location.row });
+    for c in 0..start.location.col {
+        energized_tiles.insert(Location { col: c, row: start.location.row });
     }
 
-    let mut search_vector = vec![(root, Direction::West)];
+    let mut search_vector = vec![(start, Direction::West)];
     let mut already_visited = Vec::new();
     loop {
         let mut next_search = Vec::new();
         for (search_node, direction_from) in search_vector {
-            already_visited.push((search_node, direction_from));
+            already_visited.push((search_node.clone(), direction_from));
 
-            let next_nodes = search_node.data.0.next_nodes(direction_from, important_tiles, cols, rows);
-            for (next_node_data, next_direction) in next_nodes {
-                let next_node = Node::new((next_node_data, next_direction), arena);
-
-                add_energized(&mut energized_tiles, search_node, next_node);
-
-                // SAFETY: we're single-threaded and still in construction stage,
-                // so there are no other references (neither mutable nor immutable)
-                unsafe {
-                    (*search_node.edges.get()).push(next_node);
-                }
+            let next_nodes = search_node.next_nodes(direction_from, important_tiles, cols, rows);
+            for (next_node, next_direction) in next_nodes {
+                add_energized(&mut energized_tiles, &search_node, &next_node);
                 next_search.push((next_node, next_direction));
             }
         }
 
-        next_search.retain(|(next_node, next_dir)|
-            !already_visited.iter()
-                .any(|(node, dir)| dir == next_dir && next_node.data == node.data)
-        );
+        next_search.retain(|elem| !already_visited.contains(elem));
 
         if next_search.is_empty() {
             break;
@@ -84,9 +67,9 @@ fn construct_graph<'a>(root: &'a MirrorNode<'a>, arena: &'a Arena<MirrorNode<'a>
     energized_tiles.len() as i32
 }
 
-fn add_energized<'a>(set: &mut HashSet<Location>, from: &'a MirrorNode<'a>, to: &'a MirrorNode<'a>) {
-    let Location { col: from_col, row: from_row } = from.data.0.location;
-    let Location { col: to_col, row: to_row } = to.data.0.location;
+fn add_energized<'a>(set: &mut HashSet<Location>, from: &NodeData, to: &NodeData) {
+    let Location { col: from_col, row: from_row } = from.location;
+    let Location { col: to_col, row: to_row } = to.location;
 
     if from_col == to_col {
         let start = min(from_row, to_row);
