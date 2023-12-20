@@ -104,6 +104,7 @@ impl crate::days::Day for Day14Part2 {
             .map(|(map, _)| map)
             .unwrap();
 
+        #[cfg(debug_assertions)]
         print_field(&round_rocks, &cubed_rock_vec, actual_cols as i32, rows);
         round_rocks.into_iter()
             .fold(0, |acc, rock| acc + rows - rock.row)
