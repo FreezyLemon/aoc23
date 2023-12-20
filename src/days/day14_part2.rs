@@ -112,6 +112,7 @@ impl crate::days::Day for Day14Part2 {
     }
 }
 
+#[cfg(debug_assertions)]
 fn print_field(round_rocks: &[Location], cubed_rocks: &[Location], cols: Coordinate, rows: Coordinate) {
     for row in 0..rows {
         let mut row_string = String::with_capacity(row as usize);
