@@ -9,7 +9,8 @@ impl crate::days::Day for Day16Part2 {
     fn solve(&self, input: &str) -> String {
         let cols = input.find(LINE_SEPARATOR).expect("has line separator");
         let str_cols = LINE_SEPARATOR.len() + cols;
-        let rows = 1 + (input.len() / str_cols) as i32;
+        let rows = 1 + (input.len() / str_cols) as Coordinate;
+        let cols = cols as Coordinate;
 
         let nw_mirrors = get_locations(input, str_cols, '/');
         let ne_mirrors = get_locations(input, str_cols, '\\');
@@ -36,7 +37,7 @@ impl crate::days::Day for Day16Part2 {
                 row,
                 col: 0,
             };
-            let energized = construct_graph(first_node.clone(), Direction::West, start_location, &important_tiles, cols as i32, rows);
+            let energized = construct_graph(first_node.clone(), Direction::West, start_location, &important_tiles, cols, rows);
             if energized > energized_max {
                 energized_max = energized;
             }
@@ -51,7 +52,7 @@ impl crate::days::Day for Day16Part2 {
                 row,
                 col: cols as Coordinate - 1,
             };
-            let energized = construct_graph(first_node.clone(), Direction::West, start_location, &important_tiles, cols as i32, rows);
+            let energized = construct_graph(first_node.clone(), Direction::West, start_location, &important_tiles, cols, rows);
             if energized > energized_max {
                 energized_max = energized;
             }
@@ -68,7 +69,7 @@ impl crate::days::Day for Day16Part2 {
                 row: 0,
                 col,
             };
-            let energized = construct_graph(first_node.clone(), Direction::North, start_location, &important_tiles, cols as i32, rows);
+            let energized = construct_graph(first_node.clone(), Direction::North, start_location, &important_tiles, cols, rows);
             if energized > energized_max {
                 energized_max = energized;
             }
@@ -83,7 +84,7 @@ impl crate::days::Day for Day16Part2 {
                 row: rows - 1,
                 col,
             };
-            let energized = construct_graph(first_node.clone(), Direction::South, start_location, &important_tiles, cols as i32, rows);
+            let energized = construct_graph(first_node.clone(), Direction::South, start_location, &important_tiles, cols, rows);
             if energized > energized_max {
                 energized_max = energized;
             }
@@ -156,7 +157,6 @@ fn get_locations(s: &str, cols: usize, char: char) -> Vec<Location> {
 struct NodeData {
     location: Location,
     tile: Tile,
-    // connections: Vec<Node>,
 }
 
 impl NodeData {
@@ -164,7 +164,6 @@ impl NodeData {
         Self {
             location,
             tile,
-            // connections: Vec::new(),
         }
     }
 
@@ -199,7 +198,7 @@ impl NodeData {
     }
 }
 
-type Coordinate = i32;
+type Coordinate = i16;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Location {
