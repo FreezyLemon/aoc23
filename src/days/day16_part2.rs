@@ -1,5 +1,4 @@
 use std::cmp::min;
-use std::collections::HashSet;
 
 use crate::LINE_SEPARATOR;
 
@@ -95,7 +94,8 @@ impl crate::days::Day for Day16Part2 {
 }
 
 fn construct_graph<'a>(first_node: NodeData, from_direction: Direction, start_location: Location, important_tiles: &[NodeData], cols: Coordinate, rows: Coordinate) -> i32 {
-    let mut energized_tiles = HashSet::new();
+    let mut energized_tiles = vec![false; cols as usize * rows as usize];
+    // let mut energized_tiles = HashSet::new();
     let mut search_vector = vec![(first_node, from_direction)];
     let mut already_visited = Vec::new();
     loop {
@@ -105,7 +105,7 @@ fn construct_graph<'a>(first_node: NodeData, from_direction: Direction, start_lo
 
             let next_nodes = search_node.next_nodes(direction_from, important_tiles, cols, rows);
             for (next_node, next_direction) in next_nodes {
-                add_energized(&mut energized_tiles, search_node.location, next_node.location);
+                add_energized(&mut energized_tiles, cols, search_node.location, next_node.location);
                 next_search.push((next_node, next_direction));
             }
         }
@@ -119,12 +119,12 @@ fn construct_graph<'a>(first_node: NodeData, from_direction: Direction, start_lo
     }
 
     // add tiles from start to first mirror/splitter
-    add_energized(&mut energized_tiles, start_location, already_visited[0].0.location);
+    add_energized(&mut energized_tiles, cols, start_location, already_visited[0].0.location);
 
-    energized_tiles.len() as i32
+    energized_tiles.into_iter().filter(|b| *b).count() as i32
 }
 
-fn add_energized<'a>(set: &mut HashSet<Location>, from: Location, to: Location) {
+fn add_energized<'a>(set: &mut Vec<bool>, cols: Coordinate, from: Location, to: Location) {
     let Location { col: from_col, row: from_row } = from;
     let Location { col: to_col, row: to_row } = to;
 
@@ -132,13 +132,15 @@ fn add_energized<'a>(set: &mut HashSet<Location>, from: Location, to: Location) 
         let start = min(from_row, to_row);
         let end = start + (from_row - to_row).abs();
         for row in start..=end {
-            set.insert(Location { col: from_col, row });
+            let idx = row as usize * cols as usize + from_col as usize;
+            set[idx] = true;
         }
     } else if from_row == to_row {
         let start = min(from_col, to_col);
         let end = start + (from_col - to_col).abs();
         for col in start..=end {
-            set.insert(Location { col, row: from_row });
+            let idx = from_row as usize * cols as usize + col as usize;
+            set[idx] = true;
         }
     } else {
         panic!("from/to should always be on the same x- or y-axis");
