@@ -1,5 +1,4 @@
 mod days;
-pub mod graph;
 
 pub use crate::days::*;
 
