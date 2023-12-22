@@ -1,12 +1,10 @@
 use std::{ops::{IndexMut, Index}, collections::BinaryHeap, cmp::Reverse};
 
-use crate::LINE_SEPARATOR;
-
 pub struct Day17Part1;
 
 impl crate::days::Day for Day17Part1 {
     fn solve(&self, input: &str) -> String {
-        let cols = input.find(LINE_SEPARATOR).expect("has line separator");
+        let cols = input.find('\n').expect("has line separator");
         // let str_cols = LINE_SEPARATOR.len() + cols;
         // let rows = 1 + (input.len() / str_cols);
 

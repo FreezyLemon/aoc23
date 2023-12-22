@@ -1,4 +1,3 @@
-use crate::LINE_SEPARATOR;
 use std::collections::HashMap;
 
 pub struct Day14Part2;
@@ -12,8 +11,8 @@ const CYCLE: &[Direction] = &[
 
 impl crate::days::Day for Day14Part2 {
     fn solve(&self, input: &str) -> String {
-        let str_cols = LINE_SEPARATOR.len() + input.find(LINE_SEPARATOR).expect("has line separator");
-        let actual_cols = str_cols - LINE_SEPARATOR.len();
+        let actual_cols = input.find('\n').expect("has line separator");
+        let str_cols = actual_cols + 1;
         let rows = 1 + (input.len() / str_cols) as i32;
 
         let cubed_rock_vec: Vec<Location> = input.match_indices('#')

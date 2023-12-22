@@ -1,14 +1,12 @@
 use std::cmp::min;
 use std::collections::HashSet;
 
-use crate::LINE_SEPARATOR;
-
 pub struct Day16Part1;
 
 impl crate::days::Day for Day16Part1 {
     fn solve(&self, input: &str) -> String {
-        let cols = input.find(LINE_SEPARATOR).expect("has line separator");
-        let str_cols = LINE_SEPARATOR.len() + cols;
+        let cols = input.find('\n').expect("has line separator");
+        let str_cols = 1 + cols;
         let rows = 1 + (input.len() / str_cols) as i32;
 
         let nw_mirrors = get_locations(input, str_cols, '/');

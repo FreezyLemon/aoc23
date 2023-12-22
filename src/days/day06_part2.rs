@@ -1,10 +1,8 @@
-use crate::LINE_SEPARATOR;
-
 pub struct Day6Part2;
 
 impl crate::days::Day for Day6Part2 {
     fn solve(&self, input: &str) -> String {
-        let (time, distance) = input.split_once(LINE_SEPARATOR).expect("has 1+ newline");
+        let (time, distance) = input.split_once('\n').expect("has 1+ newline");
 
         let (_, time) = time.split_once(':').expect("has :");
         let (_, distance) = distance.split_once(':').expect("has :");

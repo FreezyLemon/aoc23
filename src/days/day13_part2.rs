@@ -1,11 +1,9 @@
-use crate::DOUBLE_LINE_SEPARATOR;
-
 pub struct Day13Part2;
 
 // assumption: all cols (rows) inside a pattern are of the same length
 impl crate::days::Day for Day13Part2 {
     fn solve(&self, input: &str) -> String {
-        let patterns: Vec<_> = input.split(DOUBLE_LINE_SEPARATOR)
+        let patterns: Vec<_> = input.split("\n\n")
             .map(|pat| {
                 let lines: Vec<&str> = pat.lines().collect();
                 let col_len = lines.len();

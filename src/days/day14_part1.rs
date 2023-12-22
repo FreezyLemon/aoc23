@@ -1,10 +1,8 @@
-use crate::LINE_SEPARATOR;
-
 pub struct Day14Part1;
 
 impl crate::days::Day for Day14Part1 {
     fn solve(&self, input: &str) -> String {
-        let cols = LINE_SEPARATOR.len() + input.find(LINE_SEPARATOR).expect("has line separator");
+        let cols = 1 + input.find('\n').expect("has line separator");
         let rows = (input.len() / cols) as i32;
 
         let mut cubed_rocks: Vec<_> = input.match_indices('#')
