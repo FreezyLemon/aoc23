@@ -20,10 +20,6 @@ fn dijkstra(cost_map: &CostMap, start_at: (u32, u32)) -> u32 {
         data: vec![Vec::new(); cost_map.data.len()],
         cols: cost_map.cols,
     };
-    let mut prev_map = Cartesian {
-        data: vec![None; cost_map.data.len()],
-        cols: cost_map.cols,
-    };
 
     let start_idx = start_at;
     let end_idx = (cost_map.cols - 1, cost_map.rows() - 1);
@@ -31,7 +27,6 @@ fn dijkstra(cost_map: &CostMap, start_at: (u32, u32)) -> u32 {
 
     // can't go north from start, so this is fine
     distance_map[start_idx] = vec![(cost_map[start_idx] as u32, Direction::North, 0)];
-    prev_map[start_idx] = Some(start_idx);
 
     let mut queue = BinaryHeap::new();
     queue.push((Reverse(0u32), Reverse(0), start_idx, Direction::North));
@@ -62,7 +57,6 @@ fn dijkstra(cost_map: &CostMap, start_at: (u32, u32)) -> u32 {
             let neighbour_distances = &mut distance_map[neighbour];
             if neighbour_distances.iter().all(|(_, direction, _)| new_direction != *direction) {
                 // never visited in this direction before. just add and go on
-                prev_map[neighbour] = Some(idx);
                 neighbour_distances.push((new_cost, new_direction, new_direction_count));
                 queue.push((Reverse(new_cost), Reverse(new_direction_count), neighbour, new_direction));
                 continue;
@@ -71,7 +65,6 @@ fn dijkstra(cost_map: &CostMap, start_at: (u32, u32)) -> u32 {
             let neighbour_distance_count = neighbour_distances.len();
             neighbour_distances.retain(|(cost, direction, direction_count)| *direction != new_direction || *cost < new_cost || *direction_count < new_direction_count);
             if neighbour_distances.len() < neighbour_distance_count {
-                prev_map[neighbour] = Some(idx);
                 neighbour_distances.push((new_cost, new_direction, new_direction_count));
                 queue.push((Reverse(new_cost), Reverse(new_direction_count), neighbour, new_direction));
                 continue;
@@ -79,7 +72,6 @@ fn dijkstra(cost_map: &CostMap, start_at: (u32, u32)) -> u32 {
 
             if let Some((_, _, min_neighbour_dir_count)) = neighbour_distances.iter().filter(|(_, direction, _)| new_direction == *direction).min_by_key(|(_, _, c)| c) {
                 if new_direction_count < *min_neighbour_dir_count {
-                    prev_map[neighbour] = Some(idx);
                     neighbour_distances.push((new_cost, new_direction, new_direction_count));
                     queue.push((Reverse(new_cost), Reverse(new_direction_count), neighbour, new_direction));
                 }
