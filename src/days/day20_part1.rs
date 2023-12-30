@@ -1,10 +1,8 @@
-use std::collections::HashMap;
-
 pub struct Day20Part1;
 
 impl crate::days::Day for Day20Part1 {
     fn solve(&self, input: &str) -> String {
-        let mut modules: HashMap<&str, Module> = input.lines()
+        let modules: Vec<(&str, Module, Vec<&str>)> = input.lines()
             .map(|line| line.split_once(" -> ").expect("line has ->"))
             .map(|(module, destinations)| {
                 let kind = match &module[..1] {
@@ -25,37 +23,70 @@ impl crate::days::Day for Day20Part1 {
                     kind
                 };
 
-                let destinations = destinations.split(',')
+                let str_destinations: Vec<_> = destinations.split(',')
                     .map(|m| m.trim())
                     .collect();
 
                 (
                     name,
                     Module {
-                        name,
                         kind,
-                        destinations,
-                    }
+                        destinations: Vec::new(),
+                    },
+                    str_destinations
                 )
             })
             .collect();
 
+        // output modules don't really exist.
+        // we use indices that come after real modules for these,
+        // and remember them for later
+        let mut output_index = modules.len();
+        let mut output_modules = Vec::new();
+
+        let mut modules: Vec<Module> = modules.iter()
+            .map(|(_, module, str_destinations)| {
+                let destinations = str_destinations.into_iter()
+                    .map(|dest| {
+                        if let Some((idx, _)) = modules.iter()
+                            .enumerate()
+                            .find(|(_, (name, _, _))| *name == *dest)
+                        {
+                            idx
+                        }
+                        else
+                        {
+                            output_index += 1;
+                            output_modules.push((dest, output_index));
+                            output_index
+                        }
+                    });
+
+                let mut module = module.clone();
+                module.destinations.extend(destinations);
+
+                module
+            })
+            .collect();
+
         // initialize memory for conjunction modules
-        let conjunctions: Vec<_> = modules.values()
-            .filter(|m| {
+        let conjunctions: Vec<_> = modules.iter()
+            .enumerate()
+            .filter(|(_, m)| {
                 if let ModuleKind::Conjunction(_) = m.kind {
                     true
                 } else {
                     false
                 }
             })
-            .map(|m| m.name)
+            .map(|(idx, _)| idx)
             .collect();
 
         for conj in conjunctions {
-            let pointing_to_conj: Vec<_> = modules.values()
-                .filter(|m| m.destinations.contains(&conj))
-                .map(|m| m.name)
+            let pointing_to_conj: Vec<_> = modules.iter()
+                .enumerate()
+                .filter(|(_, m)| m.destinations.contains(&conj))
+                .map(|(idx, _)| idx)
                 .collect();
 
             for other in pointing_to_conj {
@@ -71,11 +102,17 @@ impl crate::days::Day for Day20Part1 {
             }
         }
 
+        let broadcast_idx = modules.iter()
+            .enumerate()
+            .find(|(_, m)| m.kind == ModuleKind::Broadcast)
+            .map(|(idx, _)| idx)
+            .expect("broadcast exists");
+
         // done initializing
         let mut low_pulses = 0;
         let mut high_pulses = 0;
         for _ in 0..1000 {
-            let mut pulses = vec![("button", "broadcaster", Pulse::Low)];
+            let mut pulses = vec![(broadcast_idx, broadcast_idx, Pulse::Low)];
             'button_push: loop {
                 let mut next_pulses = Vec::new();
                 for (from, to, pulse) in pulses {
@@ -86,7 +123,7 @@ impl crate::days::Day for Day20Part1 {
                     }
 
                     if let Some(to_module) = modules.get_mut(to) {
-                        next_pulses.extend(to_module.handle_pulse(pulse, from));
+                        next_pulses.extend(to_module.handle_pulse(pulse, from, to));
                     };
                 }
     
@@ -103,17 +140,16 @@ impl crate::days::Day for Day20Part1 {
     }
 }
 
-#[derive(Debug)]
-struct Module<'input> {
-    name: &'input str,
-    kind: ModuleKind<'input>,
-    destinations: Vec<&'input str>,
+#[derive(Debug, Clone)]
+struct Module {
+    kind: ModuleKind,
+    destinations: Vec<usize>,
 }
 
-impl<'input> Module<'input> {
-    fn handle_pulse(&mut self, pulse: Pulse, from: &'input str) -> Vec<(&'input str, &'input str, Pulse)> {
+impl Module {
+    fn handle_pulse(&mut self, pulse: Pulse, from: usize, to: usize) -> Vec<(usize, usize, Pulse)> {
         match self.kind {
-            ModuleKind::Broadcast => self.destinations.iter().map(|d| (self.name, *d, pulse)).collect(),
+            ModuleKind::Broadcast => self.destinations.iter().map(|d| (to, *d, pulse)).collect(),
             ModuleKind::FlipFlop(ref mut on) => {
                 if pulse != Pulse::Low {
                     return vec![];
@@ -123,7 +159,7 @@ impl<'input> Module<'input> {
 
                 self.destinations.iter().map(|d| {
                     (
-                        self.name,
+                        to,
                         *d,
                         if *on {
                             Pulse::High
@@ -136,7 +172,7 @@ impl<'input> Module<'input> {
             }
             ModuleKind::Conjunction(ref mut others) => {
                 let Some((_, ref mut other_pulse)) = others.iter_mut().find(|(m, _)| *m == from) else {
-                    unreachable!()
+                    unreachable!();
                 };
 
                 *other_pulse = pulse;
@@ -148,7 +184,7 @@ impl<'input> Module<'input> {
                 };
 
                 self.destinations.iter()
-                    .map(|d| (self.name, *d, out_pulse))
+                    .map(|d| (to, *d, out_pulse))
                     .collect()
             }
             ModuleKind::Untyped => vec![]
@@ -156,11 +192,11 @@ impl<'input> Module<'input> {
     }
 }
 
-#[derive(Debug, PartialEq)]
-enum ModuleKind<'input> {
+#[derive(Debug, Clone, PartialEq)]
+enum ModuleKind {
     Broadcast,
     FlipFlop(bool),
-    Conjunction(Vec<(&'input str, Pulse)>),
+    Conjunction(Vec<(usize, Pulse)>),
     Untyped,
 }
 
