@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 pub struct Day20Part1;
 
 impl crate::days::Day for Day20Part1 {
@@ -111,29 +113,21 @@ impl crate::days::Day for Day20Part1 {
         // done initializing
         let mut low_pulses = 0;
         let mut high_pulses = 0;
+        let mut pulses = VecDeque::with_capacity(100);
         for _ in 0..1000 {
-            let mut pulses = vec![(broadcast_idx, broadcast_idx, Pulse::Low)];
-            'button_push: loop {
-                let mut next_pulses = Vec::new();
-                for (from, to, pulse) in pulses {
-                    if pulse == Pulse::High {
-                        high_pulses += 1;
-                    } else {
-                        low_pulses += 1;
-                    }
+            pulses.push_back((broadcast_idx, broadcast_idx, Pulse::Low));
 
-                    if let Some(to_module) = modules.get_mut(to) {
-                        next_pulses.extend(to_module.handle_pulse(pulse, from, to));
-                    };
+            while let Some((from, to, pulse)) = pulses.pop_front() {
+                if pulse == Pulse::High {
+                    high_pulses += 1;
+                } else {
+                    low_pulses += 1;
                 }
-    
-                if next_pulses.is_empty() {
-                    break 'button_push;
-                }
-    
-                pulses = next_pulses;
+
+                if let Some(to_module) = modules.get_mut(to) {
+                    to_module.handle_pulse(&mut pulses, pulse, from, to);
+                };
             }
-
         }
 
         (low_pulses * high_pulses).to_string()
@@ -147,28 +141,29 @@ struct Module {
 }
 
 impl Module {
-    fn handle_pulse(&mut self, pulse: Pulse, from: usize, to: usize) -> Vec<(usize, usize, Pulse)> {
+    fn handle_pulse(&mut self, pulses: &mut VecDeque<(usize, usize, Pulse)>, pulse: Pulse, from: usize, to: usize) {
         match self.kind {
-            ModuleKind::Broadcast => self.destinations.iter().map(|d| (to, *d, pulse)).collect(),
+            ModuleKind::Broadcast => {
+                for d in &self.destinations {
+                    pulses.push_back((to, *d, pulse));
+                }
+            },
             ModuleKind::FlipFlop(ref mut on) => {
                 if pulse != Pulse::Low {
-                    return vec![];
+                    return;
                 }
 
                 *on = !*on;
 
-                self.destinations.iter().map(|d| {
-                    (
-                        to,
-                        *d,
-                        if *on {
-                            Pulse::High
-                        } else {
-                            Pulse::Low
-                        }
-                    )
-                })
-                .collect()
+                let pulse = if *on {
+                    Pulse::High
+                } else {
+                    Pulse::Low
+                };
+
+                for d in &self.destinations {
+                    pulses.push_back((to, *d, pulse));
+                }
             }
             ModuleKind::Conjunction(ref mut others) => {
                 let Some((_, ref mut other_pulse)) = others.iter_mut().find(|(m, _)| *m == from) else {
@@ -183,11 +178,11 @@ impl Module {
                     Pulse::High
                 };
 
-                self.destinations.iter()
-                    .map(|d| (to, *d, out_pulse))
-                    .collect()
+                for d in &self.destinations {
+                    pulses.push_back((to, *d, out_pulse));
+                }
             }
-            ModuleKind::Untyped => vec![]
+            ModuleKind::Untyped => {}
         }
     }
 }
