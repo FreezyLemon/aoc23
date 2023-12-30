@@ -183,9 +183,9 @@ impl Direction {
         }
     }
 
-    fn invert(self) -> Self {
-        self.turn_left().turn_left()
-    }
+    // fn invert(self) -> Self {
+    //     self.turn_left().turn_left()
+    // }
 
     fn turn_right(self) -> Self {
         self.turn_left().turn_left().turn_left()
