@@ -20,9 +20,7 @@ macro_rules! import_days {
 }
 
 // normal modules, dayXX_partY
-import_days!(01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,);
-
-import_module!(day20_part1);
+import_days!(01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,);
 
 // custom modules
 import_module!(day01_part2_malox);
